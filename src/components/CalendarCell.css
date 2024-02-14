@@ -1,0 +1,16 @@
+.calendar-cell {
+    height: auto;
+    width: auto;
+    border: 1px solid black;
+    color: black;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.current-day{
+    border: 2px solid black;
+}
+
+.date-of-month {
+    width: fit-content;
+}
