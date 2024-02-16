@@ -1,24 +1,27 @@
 import Navigation from "../components/Navigation";
-// import CalendarCell from "../components/CalendarCell";
-// import MonthCalendar from "../components/MonthCalendar";
 import {useEffect, useState} from "react";
 import Requests from "../API/requests";
 import MonthCalendar from "../components/MonthCalendar";
 
-function Calendar() {
-    const [calendars, setCalendars] = useState([]);
+function Calendars() {
+    const [calendars, setCalendars] = useState();
+    // const [events, setEvents] = useState([]);
 
-    useEffect(async () => {
-        const resp = await Requests.allCalendars(
-            localStorage.getItem('token')
-        );
-        setCalendars(resp.data);
-        const events_resp = await Requests.allEvents(
-            localStorage.getItem('token'),
-            'US',
-            resp.data[0].id
-        );
-        console.log(events_resp.data);
+    useEffect( () => {
+        const fetchData = async () => {
+            const resp = await Requests.allCalendars(
+                localStorage.getItem('token')
+            );
+            const events_resp = await Requests.allEvents(
+                localStorage.getItem('token'),
+                'US',
+                resp.data[0].id
+            );
+            resp.data[0].fullData = events_resp.data;
+            setCalendars(resp.data);
+            console.log(JSON.stringify(events_resp.data));
+        }
+        fetchData();
     }, [])
 
     return (
@@ -26,7 +29,6 @@ function Calendar() {
             <Navigation/>
             <div className={'main-content'}>
                 <div className={'center-block'}>
-                    {/*<div>{JSON.stringify(calendars)}</div>*/}
                     {calendars &&
                         calendars.map((calendarData) => (
                             <MonthCalendar key={`calendar-${calendarData.id}`} calendarData={calendarData}/>
@@ -38,4 +40,4 @@ function Calendar() {
     );
 }
 
-export default Calendar;
+export default Calendars;

@@ -1,16 +1,39 @@
 .calendar-cell {
-    height: auto;
+    height: 50px;
     width: auto;
-    border: 1px solid black;
+    border: 0.1px solid black;
     color: black;
     padding: 5px;
     font-weight: bold;
+    position: relative;
 }
 
-.current-day{
-    border: 2px solid black;
-}
+/*.current-day{*/
+/*    border: 2px solid black;*/
+/*}*/
 
 .date-of-month {
+    position: absolute;
     width: fit-content;
+}
+
+.events-size, .holidays-size {
+    right: 5px;
+    position: absolute;
+    color: black;
+    font-size: 10px;
+    width: 13px;
+    height: 13px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.events-size {
+    top: 5px;
+    background-color: rgba(0, 255, 0, 0.7);
+}
+
+.holidays-size {
+    top: 23px;
+    background-color: rgba(0, 0, 255, 0.7);
 }

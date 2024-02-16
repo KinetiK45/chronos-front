@@ -4,12 +4,25 @@
     width: 800px;
 }
 
-.month-calendar .days {
+.month-calendar .days, .month-calendar .days-names {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     grid-gap: 0;
 }
 
-h1, h3 {
+h1 {
+    margin: 5px;
+    cursor: pointer;
+}
+
+h3 {
     margin: 0;
+}
+
+.calendar-info {
+    height: fit-content;
+}
+
+.hidden {
+    display: none;
 }
