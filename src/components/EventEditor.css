@@ -1,0 +1,30 @@
+.event-editor {
+    display: grid;
+    position: absolute;
+    z-index: 10;
+}
+
+.event-editor #description {
+    background: transparent;
+    color: var(--text-color);
+    transition-duration: unset;
+    resize: vertical;
+}
+
+.event-editor > * {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.event-editor > input[type='text'] {
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--text-color);
+    color: var(--text-color);
+}
+
+.event-editor > select {
+    background: none;
+    border: none;
+    color: var(--text-color);
+}

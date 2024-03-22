@@ -1,8 +1,8 @@
 .calendar-cell {
     height: 50px;
     width: auto;
-    border: 0.1px solid black;
-    color: black;
+    color: var(--text-color);
+    background-color: var(--calendar-cells-background);
     padding: 5px;
     font-weight: bold;
     position: relative;

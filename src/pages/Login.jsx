@@ -15,7 +15,7 @@ async function handle_auth() {
     if (resp.state === true){
         localStorage.setItem('user_id', resp.data.user_id);
         localStorage.setItem('token', resp.data.auth_key);
-        window.location.href = '/calendars';
+        window.location.href = `/users/${resp.data.user_id}`;
     }
     else
         displayError(resp.message);

@@ -61,7 +61,7 @@ function Registration() {
                         <input id={'email'} name={'email'} type={'email'} placeholder={'email'} pattern={'^.*@.*\\..*$'}/>
                     </div>
                     <div className={'text-line'}>
-                        <p>Маєте аккаунт? <a href={'/login'}>Вхід</a></p>
+                        <p>Маєте аккаунт? <a href={`${window.location.origin}/login`}>Вхід</a></p>
                     </div>
                     <br/>
                     <button className={'form-submit'} onClick={handle_reg}>Зареєструватись</button>

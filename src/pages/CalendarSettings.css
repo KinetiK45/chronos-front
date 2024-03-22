@@ -1,0 +1,39 @@
+.calendar-info-editor {
+    display: grid;
+    grid-gap: 20px;
+    grid-template-columns: max-content auto;
+}
+
+.calendar-info-editor > input[type="text"] {
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--text-color);
+    text-align: center;
+    color: var(--text-color);
+    font-size: 1em;
+}
+
+.calendar-user-inspect {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+}
+
+.calendar-user-inspect-userdata {
+    align-items: center;
+    display: flex;
+    width: max-content;
+}
+
+.calendar-user-inspect-avatar {
+    min-height: 50px;
+    height: 50px;
+    max-height: 50px;
+    min-width: 50px;
+    width: 50px;
+    max-width: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+

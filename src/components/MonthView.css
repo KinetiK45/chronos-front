@@ -1,18 +1,17 @@
 .month-calendar {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--background-color-objects);
     padding: 10px;
-    width: 800px;
 }
 
 .month-calendar .days, .month-calendar .days-names {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-gap: 0;
+    grid-gap: 1px;
+    overflow-x: scroll;
 }
 
 h1 {
     margin: 5px;
-    cursor: pointer;
 }
 
 h3 {
@@ -25,4 +24,13 @@ h3 {
 
 .hidden {
     display: none;
+}
+
+.month-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.month-header * {
+    width: max-content;
 }
