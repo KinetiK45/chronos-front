@@ -6,7 +6,6 @@ body {
   justify-content: center;
   font-family: Arial, Helvetica, sans-serif;
   /*font-family: Georgia, serif;*/
-
   color: var(--text-color);
 }
 
@@ -21,6 +20,29 @@ hr {
   margin: 8px 0 0 0;
 }
 
+svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--text-color);
+}
+
+input[type='text'], input[type='password'], input[type='email'] {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: center;
+  padding: 5px;
+  border-bottom: 1px solid var(--text-color);
+  font-size: 1em;
+  max-height: 1.5em;
+  color: var(--text-color);
+}
+
+select {
+  background: none;
+  border: none;
+  color: var(--text-color);
+}
 
 .main {
   display: flex;

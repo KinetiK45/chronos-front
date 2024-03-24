@@ -4,7 +4,7 @@ import DayViewEventDataDisplay from "./DayViewEventDataDisplay";
 import Requests from "../API/requests";
 import {
     calculateEventH,
-    calculateEventLeft,
+    calculateEventLeft, cropDateToCurrent,
     getDateMinutes,
     getEventHeightPercent,
     hexToRgba,
@@ -13,7 +13,13 @@ import {
 
 const TRANSITION_DURATION = '0.3s';
 
-function DayViewEvent({eventData, currentViewDate, countColumns, onEditorCalled, onTimeChange, isResizable = true}) {
+function DayViewEvent({
+                          eventData,
+                          currentViewDate,
+                          countColumns,
+                          onEditorCalled,
+                          onTimeChange,
+                          isResizable = true}) {
     const eventDataRef = useRef(null);
     const eventLineRef = useRef(null);
     const [timeUpdate, setTimeUpdate] = useState(false);
@@ -105,9 +111,11 @@ function DayViewEvent({eventData, currentViewDate, countColumns, onEditorCalled,
 
         const targetDateMinutes = getDateMinutes(isEndChange ? eventData.startAt : eventData.endAt, currentViewDate) + heightMinutes * sizeCoefficient;
 
-        const newDate = new Date(currentViewDate);
+        let newDate = new Date(currentViewDate);
         newDate.setHours(targetDateMinutes / 60);
         newDate.setMinutes(targetDateMinutes % 60);
+
+        newDate = cropDateToCurrent(newDate, currentViewDate);
 
         if (isEndChange){
             eventData.endAt = newDate;
@@ -116,7 +124,6 @@ function DayViewEvent({eventData, currentViewDate, countColumns, onEditorCalled,
             eventData.startAt = newDate;
         }
         setTimeUpdate(true);
-        eventLineRef.current.style.height = `${initialHeight + deltaY * sizeCoefficient}px`;
     }
 
     function handleResizeEnd() {
@@ -162,12 +169,6 @@ function DayViewEvent({eventData, currentViewDate, countColumns, onEditorCalled,
             key={`event-${eventData.id}`}
             onClick={(event) => {
                 event.stopPropagation();
-                onEditorCalled({
-                    eventData: eventData,
-                    startAt: eventData.startAt,
-                    endAt: eventData.endAt,
-                    columnIndex: eventData.columnIndex === countColumns - 1 ? eventData.columnIndex - 1 : eventData.columnIndex + 1,
-                });
             }}
             onMouseEnter={() => {
                 eventDataRef.current.style.zIndex = 2;
@@ -193,6 +194,14 @@ function DayViewEvent({eventData, currentViewDate, countColumns, onEditorCalled,
             <DayViewEventDataDisplay
                 currentViewDate={currentViewDate}
                 eventData={eventData}
+                onEditButtonPressed={() => {
+                    onEditorCalled({
+                        eventData: eventData,
+                        startAt: eventData.startAt,
+                        endAt: eventData.endAt,
+                        columnIndex: eventData.columnIndex === countColumns - 1 ? eventData.columnIndex - 1 : eventData.columnIndex + 1,
+                    });
+                }}
             />
         </div>
     </div>

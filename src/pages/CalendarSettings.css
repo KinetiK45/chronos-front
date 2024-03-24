@@ -1,17 +1,17 @@
 .calendar-info-editor {
-    display: grid;
-    grid-gap: 20px;
-    grid-template-columns: max-content auto;
+    /*display: grid;*/
+    /*grid-gap: 20px;*/
+    /*grid-template-columns: max-content auto;*/
 }
 
-.calendar-info-editor > input[type="text"] {
-    background: none;
-    border: none;
-    border-bottom: 1px solid var(--text-color);
-    text-align: center;
-    color: var(--text-color);
-    font-size: 1em;
-}
+/*.calendar-info-editor > input[type="text"] {*/
+/*    background: none;*/
+/*    border: none;*/
+/*    border-bottom: 1px solid var(--text-color);*/
+/*    text-align: center;*/
+/*    color: var(--text-color);*/
+/*    font-size: 1em;*/
+/*}*/
 
 .calendar-user-inspect {
     align-items: center;
@@ -36,4 +36,9 @@
     border-radius: 50%;
     margin-right: 10px;
 }
+
+/*input[type='color'] {*/
+/*    width: 50px;*/
+/*    height: 50px;*/
+/*}*/
 

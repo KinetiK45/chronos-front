@@ -41,8 +41,8 @@
     user-select: none;
     position: absolute;
     height:  100%;
-    width: 95%;
-    left: 5%;
+    width: 94%;
+    left: 6%;
     top: 0;
     white-space: nowrap; /* Предотвращает перенос слов */
     overflow-x: auto; /* Добавляет горизонтальную прокрутку при необходимости */

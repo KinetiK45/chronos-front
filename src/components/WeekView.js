@@ -1,7 +1,6 @@
-import DayOfWeek from "./DayOfWeek";
-import './MonthView.css';
+import './WeekView.css';
 import {useState} from "react";
-import DayView from "./DayView";
+import WeekViewEvent from "./WeekViewEvent";
 
 function getWeekTitle(startWeek = new Date(), endWeek = new Date()) {
     let month, year;
@@ -24,9 +23,8 @@ function getWeekTitle(startWeek = new Date(), endWeek = new Date()) {
 }
 
 function WeekView({
-                      calendarId = 1,
+                      calendarData = {id: 1},
                       date = new Date(),
-                      color = '#237cfd',
                       getInfoByDay
                  }) {
     const [weekDayView, setWeekDayView] = useState(date);
@@ -64,21 +62,71 @@ function WeekView({
                 }>next</button>
             </div>
             {/*<div className={'days-names'}>*/}
-            {/*    {weekdays.map((day, index) => (*/}
+            {/*    {getWeekDates().map((day, index) => (*/}
             {/*        <div key={index} className={'day-name'}>*/}
             {/*            {day}*/}
             {/*        </div>*/}
             {/*    ))}*/}
             {/*</div>*/}
-            <div className={'days'}>
-                {weekDayView && getWeekDates().map((date) => (
-                    <DayOfWeek
-                        calendarId={calendarId}
-                        date={date}
-                        getInfoByDay={getInfoByDay}
-                    />
-                    )
-                )}
+            <div
+                className="hours-container"
+                style={{
+                    width: '1200px'
+                }}
+            >
+                {[...Array(48).keys()].map((hour, index) => (
+                    <div
+                        key={`hour-index-${index}`}
+                        className="hour-label"
+                        style={{
+                            left: '0px',
+                            width: '5%',
+                            textAlign: 'center',
+                            WebkitUserSelect: 'none',
+                            MozUserSelect: 'none',
+                            msUserSelect: 'none',
+                            userSelect: 'none',
+                        }}
+                    >
+                        {`${new Date(0, 0, 0, hour / 2, hour % 2 ? 30 : 0)
+                            .toLocaleTimeString(undefined, {hour: "numeric", minute: "numeric"})}`}
+                    </div>
+                ))}
+                <div
+                    className={'week-events-container'}
+                >
+                    {getWeekDates().map((week_day, index) => (
+                        <div
+                            style={{
+                                position: 'absolute',
+                                backgroundColor: 'rgba(0, 0, 0, 0.2)',
+                                border: '1px solid white',
+                                width: `${100/7}%`,
+                                height: '100%',
+                                left: `${100/7 * index}%`,
+                                overflowX: 'scroll'
+                            }}
+                        >
+                            {
+                                getInfoByDay(week_day)[0].map((week_day_event) => (
+                                    <WeekViewEvent
+                                        eventData={week_day_event}
+                                        currentViewDate={week_day}
+                                        countColumns={7}
+                                        isResizable={false}
+                                    />
+                                ))
+                            }
+                        </div>
+                    ))}
+                </div>
+                <div
+                    className={'current-time-line'}
+                    style={{
+                        display: date.getDate() === new Date().getDate() ? '' : 'none',
+                        pointerEvents: 'none',
+                    }}
+                ></div>
             </div>
         </div>
     );

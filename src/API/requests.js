@@ -1,8 +1,8 @@
 import axios from "axios";
 import {toShortDateFormat} from "../utils/Utils";
-import AcceptInvitation from "../pages/AcceptInvitation";
 
-const domain = 'http://localhost:3001/api';
+// const domain = 'http://localhost:3001/api';
+const domain = 'http://192.168.1.5:3001/api';
 
 const axiosInstance = axios.create({
     baseURL: domain,
@@ -88,8 +88,13 @@ export default class Requests {
         return `${domain}/user/${user_id}/avatar`;
     }
 
-    static async findUsername(usernamePart) {
-        const resp = await axiosInstance.get(`/user/findBy/${usernamePart}`);
+    static async findUsername(token, body) {
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        };
+        const resp = await axiosInstance.post(`/user/findBy`, body, config);
         return resp.data;
     }
     static async edit_user(edited_data, user_id, token){
@@ -220,6 +225,11 @@ export default class Requests {
             },
         };
         const resp = await axiosInstance.patch('/events/edit', data, config);
+        return resp.data;
+    }
+
+    static async deleteEvent(token, event_id) {
+        const resp = await axiosInstance.delete(`/events/${event_id}/delete`);
         return resp.data;
     }
 

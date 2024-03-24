@@ -59,3 +59,20 @@ export function getStartEndMonthByDate(date = new Date()){
     endOfMonth.setHours(23, 59, 59, 999);
     return [startOfMonth, endOfMonth];
 }
+
+export function getStartEndDatesByDate(date = new Date()) {
+    const start = new Date(date);
+    const end = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+    return [start, end];
+}
+
+export function cropDateToCurrent(targetDate = new Date(), currentDate = new Date()){
+    const dateBounds = getStartEndDatesByDate(currentDate);
+    if (targetDate.getTime() < dateBounds[0].getTime())
+        return dateBounds[0];
+    if (targetDate.getTime() > dateBounds[1].getTime())
+        return dateBounds[1];
+    return targetDate;
+}

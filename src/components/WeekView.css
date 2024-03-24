@@ -1,0 +1,12 @@
+.week-events-container {
+    user-select: none;
+    position: absolute;
+    height:  100%;
+    width: 95.5%;
+    left: 4.5%;
+    top: 0;
+    white-space: nowrap; /* Предотвращает перенос слов */
+    overflow-x: auto; /* Добавляет горизонтальную прокрутку при необходимости */
+    overflow-y: hidden;
+    /*display: table-column-group;*/
+}

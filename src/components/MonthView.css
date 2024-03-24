@@ -4,10 +4,11 @@
 }
 
 .month-calendar .days, .month-calendar .days-names {
+    max-width: 800px;
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(7, auto);
     grid-gap: 1px;
-    overflow-x: scroll;
+    overflow: scroll;
 }
 
 h1 {

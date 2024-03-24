@@ -18,7 +18,6 @@ function DayView({ calendarData = {id: 1},
     useEffect(() => {
         const data = getInfoByDay(currentViewDate);
         setEvents(fillViewColumns(data[0]));
-        setEvents(data[0]);
         setHolidays(data[1]);
 
     }, [currentViewDate, getInfoByDay]);
@@ -29,6 +28,8 @@ function DayView({ calendarData = {id: 1},
     function fillViewColumns(events) {
         const columns = [];
         for (let event of events) {
+            if (!('id' in event))
+                continue;
             let index = undefined;
             const minHMinutes = 33;
             for (let i = 0; i < columns.length; i++) {
@@ -45,7 +46,7 @@ function DayView({ calendarData = {id: 1},
                 }
             }
             if (index === undefined){
-                setEventColumnsSize(columns.length + 2);
+                setEventColumnsSize(Math.min(columns.length + 2, 4));
                 index = columns.length;
                 if (event.endAt.getTime() - event.startAt.getTime() < minHMinutes * 60 * 1000){
                     columns.push(new Date(event.startAt.getTime() + minHMinutes * 60 * 1000));
@@ -59,10 +60,10 @@ function DayView({ calendarData = {id: 1},
         return events;
     }
 
-    function refreshEvents() {
+    function refreshEvents(new_events = events) {
         setEvents(
             fillViewColumns(
-                [...events].sort((a, b) =>
+                [...new_events].sort((a, b) =>
                     a.startAt.getTime() - b.startAt.getTime()
                     || (b.endAt.getTime() - b.startAt.getTime()) - (a.endAt.getTime() - a.startAt.getTime()))
             )
@@ -120,16 +121,17 @@ function DayView({ calendarData = {id: 1},
         Requests.createEvent(localStorage.getItem('token'), creationData)
             .then((resp) => {
                 if (resp.state !== true){
-                    alert('Something vent wrong');
+                    refreshEvents(events.filter((ev) => 'id' in ev));
+                    alert(`Creation fail: ${resp.message}`);
                 }
                 else {
                     newEvent.id = resp.data;
+                    refreshEvents([...events.filter((ev) => 'id' in ev), newEvent]);
                 }
-            })
+            });
 
         newEvent.columnIndex = column;
-
-        setEvents([...events, newEvent]);
+        refreshEvents([...events, newEvent]);
 
         setEventEditor({
             eventData: newEvent,
@@ -233,6 +235,17 @@ function DayView({ calendarData = {id: 1},
                                     });
                                 });
                             }}
+                            onDelete={(event_id) => {
+                                Requests.deleteEvent(localStorage.getItem('token'), event_id).then((resp) => {
+                                    if (resp.state === true){
+                                        refreshEvents(events.filter((ev) => ev.id !== event_id));
+                                        setEditorEnabled(false);
+                                    }
+                                    else {
+                                        alert(`Error deleting event: ${resp.message}`);
+                                    }
+                                })
+                            }}
                         />
                     }
                 </div>
@@ -240,6 +253,7 @@ function DayView({ calendarData = {id: 1},
                     className={'current-time-line'}
                     style={{
                         display: currentViewDate.getDate() === new Date().getDate() ? '' : 'none',
+                        pointerEvents: 'none',
                     }}
                 ></div>
             </div>

@@ -3,13 +3,17 @@ import {useEffect, useState} from "react";
 import Requests from "../API/requests";
 import {useParams} from "react-router-dom";
 import './CalendarSettings.css';
+import EditableTextInput from "../components/EditableTextInput";
+import UserFinder from "../components/UserFinder";
 function CalendarSettings() {
 
     const {calendarId} = useParams();
-    const [calendarData, setCalendarData] = useState(null);
+    const [calendarData, setCalendarData] = useState(undefined);
     const [calendarUsers, setCalendarUsers] = useState([]);
-    const [editedFiels, setEditedFiels] = useState({});
-
+    const [permissions, setPermissions] = useState({
+        fieldsEdit: false,
+        roleEdit: false,
+    });
     useEffect( () => {
         const fetchData = async () => {
             const resp = await Requests.calendarById(
@@ -21,6 +25,18 @@ function CalendarSettings() {
     }, [calendarId]);
 
 
+    useEffect(() => {
+        if (calendarData){
+            setPermissions({
+                fieldsEdit: !('calendar_user' in calendarData && calendarData.calendar_user.role === 'inspector'),
+                roleEdit: Number.parseInt(localStorage.getItem('user_id')) === calendarData.user_id
+            });
+            // alert(JSON.stringify({
+            //     fieldsEdit: !('calendar_user' in calendarData && calendarData.calendar_user.role === 'inspector'),
+            //     roleEdit: Number.parseInt(localStorage.getItem('user_id')) === calendarData.user_id
+            // }))
+        }
+    }, [calendarData]);
     useEffect(() => {
         // Пользовательская функция сравнения для сортировки по ролям
         const compareRoles = (user1, user2) => {
@@ -36,14 +52,17 @@ function CalendarSettings() {
         }
         fetchData();
     }, [calendarId]);
-    async function saveChanges() {
+    async function sendEditedData(editedFields) {
         const resp = await Requests.editCalendar(localStorage.getItem('token'),
-            {...editedFiels,
+            {...editedFields,
                 'calendar_id': Number.parseInt(calendarId),
             });
-        if (resp.state === true)
-            window.location.href = `/users/${localStorage.getItem('user_id')}`;
+        if (resp.state !== true){
+            alert(resp.message);
+            window.location.reload();
+        }
     }
+
 
     const [usersFound, setUsersFound] = useState([]);
     return (
@@ -54,40 +73,30 @@ function CalendarSettings() {
                     {/*{calendarData && <div>{JSON.stringify(calendarData)}</div>}*/}
                     {calendarData &&
                         <div className={'calendar-info-editor'}>
-                            <label htmlFor={'title'}>Title:</label>
-                            <input
-                                type={'text'}
-                                placeholder={'Title'}
-                                name={'title'}
-                                defaultValue={calendarData.title}
-                                readOnly={'calendar_user' in calendarData
-                                    && calendarData.calendar_user.role === 'inspector'}
-                                onChange={(event) =>
-                                    setEditedFiels({...editedFiels, 'title': event.target.value})
-                                }
-                            />
-                            <label htmlFor={'description'}>Description:</label>
-                            <input
-                                type={'text'}
-                                placeholder={'Description'}
-                                name={'description'}
-                                readOnly={'calendar_user' in calendarData
-                                    && calendarData.calendar_user.role === 'inspector'}
-                                defaultValue={calendarData.description}
-                                onChange={(event) =>
-                                    setEditedFiels({...editedFiels, 'description': event.target.value})
-                                }
-                            />
-                            <label htmlFor={'custom-color'}>Колір ваших івентів</label>
-                            <input
-                                type={'color'}
-                                name={'custom-color'}
-                                defaultValue={calendarData?.calendar_user?.custom_color || calendarData.color}
-                                onChange={(event) =>
-                                    setEditedFiels({...editedFiels, 'color': event.target.value})
-                                }
-                            />
-                            <button onClick={saveChanges}>Save</button>
+                            <h1>
+                                <EditableTextInput
+                                    initialText={calendarData.title}
+                                    placeholder={'Title'}
+                                    onEdited={async (value) => {
+                                        await sendEditedData({
+                                            title: value,
+                                        });
+                                    }}
+                                />
+                            </h1>
+                            <h3 style={{
+                                padding: '5px',
+                            }}>
+                                <EditableTextInput
+                                    initialText={calendarData.description}
+                                    placeholder={'Description'}
+                                    onEdited={async (value) => {
+                                        await sendEditedData({
+                                            description: value,
+                                        });
+                                    }}
+                                />
+                            </h3>
                         </div>
                     }
                     <div className={'calendar-users'}>
@@ -107,8 +116,19 @@ function CalendarSettings() {
                                             {`${userdata.full_name}`}
                                         </a>
                                     </div>
+                                    <div>
+                                        <input
+                                            type={'color'}
+                                            defaultValue={calendarData?.calendar_user?.custom_color || calendarData.color}
+                                            onChange={(event) =>
+                                                sendEditedData({color: event.target.value})
+                                            }
+                                        />
+                                        <label htmlFor={'custom-color'}>Колір ваших івентів</label>
+                                    </div>
+                                    {/*<div>{JSON.stringify(userdata)}</div>*/}
                                     {
-                                        userdata.role && userdata.role !== 'owner' &&
+                                        permissions.roleEdit && userdata.role !== 'owner' &&
                                         <select
                                             className={'role-select'}
                                             defaultValue={userdata.role || 'inspector'}
@@ -127,26 +147,16 @@ function CalendarSettings() {
                                         </select>
                                     }
                                     {
-                                        (!('role' in userdata) || userdata.role === 'owner') &&
-                                        <div>Owner</div>
+                                        (!permissions.roleEdit || userdata.role === 'owner') &&
+                                        <div>{`${userdata.role}`}</div>
                                     }
                                 </div>
                             ))
                         }
                     </div>
-                    <input
-                        type={'text'}
-                        placeholder={'Username'}
-                        name={'userFinder'}
-                        onChange={(event) => {
-                            if (event.target.value.trim().length > 0)
-                                Requests.findUsername(event.target.value).then((resp) => {
-                                    if (resp.state === true)
-                                        setUsersFound(resp.data)
-                                })
-                            else
-                                setUsersFound([]);
-                        }}
+                    <UserFinder
+                        exclude_ids={calendarUsers.map((calendarUser) => calendarUser.user_id)}
+                        onFound={(found_users_data) => setUsersFound(found_users_data)}
                     />
                     <div className={'users-found'}>
                         {usersFound.map((userdata) => (
@@ -170,6 +180,7 @@ function CalendarSettings() {
                             </div>
                         ))}
                     </div>
+
                 </div>
             </div>
         </div>
