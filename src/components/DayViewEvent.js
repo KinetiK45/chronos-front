@@ -138,7 +138,7 @@ function DayViewEvent({
         updatedEventData.endAt = toLocalDateInputField(updatedEventData.endAt);
         Requests.editEvent(localStorage.getItem('token'), updatedEventData).then((resp) => {
             if (resp.state !== true)
-                alert('Something went wrong');
+                alert('Щось пішло не так');
         });
         onTimeChange();
         // console.log(`resize end`);

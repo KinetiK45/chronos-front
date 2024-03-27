@@ -21,7 +21,7 @@ function UserFinder({
                 height: '100%'
             }}
             type={'text'}
-            placeholder={'Username'}
+            placeholder={'Імʼя користувача'}
             name={'userFinder'}
             onChange={(event) => {
                 if (event.target.value.trim().length > 0)

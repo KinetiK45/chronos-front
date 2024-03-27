@@ -13,7 +13,11 @@ function DayViewEventDataDisplay({
                                      onEditButtonClicked,
                                      canChange
 }) {
-
+    const categories = {
+        'task': 'Завдання',
+        'reminder': 'Нагадування',
+        'arrangement': 'Захід',
+    }
 
     const [mouseOnData, setMouseOnData] = useState(false);
 
@@ -64,7 +68,7 @@ function DayViewEventDataDisplay({
         {eventData.category &&
             <>
                 <hr/>
-                <div>{`${eventData.category.toUpperCase()}`}</div>
+                <div>{`${categories[eventData.category]}`}</div>
             </>
         }
         {(eventData.category === 'reminder'

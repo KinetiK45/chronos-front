@@ -2,15 +2,8 @@ import Requests from "../API/requests";
 import Navigation from "../components/Navigation";
 import {useParams} from "react-router-dom";
 import {useState} from "react";
+import './EventCreation.css';
 import {toLocalDateInputField} from "../utils/Utils";
-
-function getStartEndDateLocal(date) {
-    let start = new Date(date);
-    start.setHours(0 - start.getTimezoneOffset() / 60, 0, 0, 0);
-    let end = new Date(date);
-    end.setHours(23 - start.getTimezoneOffset() / 60, 59, 59, 999);
-    return [start, end];
-}
 
 function EventCreation() {
     const {calendarId} = useParams();
@@ -20,8 +13,7 @@ function EventCreation() {
 
     const [startAt, setStartAt] = useState(searchParams.has('startAt') ? new Date(searchParams.get('startAt')) : new Date());
     const [endAt, setEndAt] = useState(searchParams.has('endAt') ? new Date(searchParams.get('endAt')) : new Date());
-    const [allDay, setAllDay] = useState(false);
-
+    const [category, setCategory] = useState('arrangement');
 
     // useEffect(() => {
     //     if (allDay === true){
@@ -37,14 +29,13 @@ function EventCreation() {
         const title = document.getElementById('title').value;
         const description = document.getElementById('description').value;
         const notification = document.getElementById('notification').checked;
-        const category = document.getElementById('categorySelector').value;
 
         if (!title) {
             alert('Пожалуйста, заполните название');
             return;
         }
 
-        if (!allDay && startAt.getTime() >= endAt.getTime()) {
+        if (startAt.getTime() >= endAt.getTime()) {
             alert(`Выберите корректные дату и время.`);
             return;
         }
@@ -53,9 +44,8 @@ function EventCreation() {
             title: title,
             description: description,
             notification: notification,
-            allDay: allDay,
-            startAt: allDay ? getStartEndDateLocal(startAt)[0].toISOString().slice(0, -8) : document.getElementById('startAt').value,
-            endAt: allDay ? getStartEndDateLocal(startAt)[1].toISOString().slice(0, -8) : document.getElementById('endAt').value,
+            startAt: document.getElementById('startAt').value,
+            endAt: document.getElementById('endAt').value,
             category: category
         }
         // alert(JSON.stringify(data));
@@ -69,73 +59,75 @@ function EventCreation() {
     return <div className="main">
         <Navigation/>
         <div className={'main-content'}>
-            <div className={'center-block'}>
+            <div
+                className={'center-block'}
+                style={{
+                    minWidth: 'auto'
+                }}
+            >
                 <div id={'event-creation'}>
-                    <br/>
                     <input
                         id={'title'}
                         type={'text'}
                         placeholder={'Title'}
                     />
-                    <br/>
-                    <input
-                        id={'description'}
-                        type={'text'}
-                        placeholder={'Description'}
+                    <textarea
+                        id="description"
+                        placeholder="Description"
+                        maxLength={255}
                     />
-                    <br/>
-                    <label htmlFor="notification">Notification:</label>
                     <input
-                        type="checkbox"
-                        id="notification"
-                        name="notification"
+                        id={'startAt'}
+                        name={'startAt'}
+                        type={'datetime-local'}
+                        defaultValue={toLocalDateInputField(startAt)}
+                        onChange={() => setStartAt(new Date(document.getElementById('startAt').value))}
                     />
-                    <br/>
-                    {
-                        allDay === true &&
-                        <label htmlFor="allDay">{`Целый день ${startAt.toLocaleDateString()}: `}</label>
-                    }
-                    {
-                        allDay === false &&
-                        <label htmlFor="allDay">All day: </label>
-                    }
                     <input
-                        type="checkbox"
-                        id="allDay"
-                        name="allDay"
-                        onChange={() => {
-                            setAllDay(!allDay)
-                        }}
+                        id={'endAt'}
+                        name={'endAt'}
+                        type={'datetime-local'}
+                        defaultValue={toLocalDateInputField(endAt)}
+                        onChange={() => setEndAt(new Date(document.getElementById('endAt').value))}
                     />
-                    <br/>
-                    {allDay === false &&
-                        <>
-                            <label htmlFor={'startAt'}>Start at:</label>
-                            <input
-                                id={'startAt'}
-                                name={'startAt'}
-                                type={'datetime-local'}
-                                defaultValue={toLocalDateInputField(startAt)}
-                                onChange={() => setStartAt(new Date(document.getElementById('startAt').value))}
-                            />
-                            <br/>
-                            <label htmlFor={'endAt'}>End at:</label>
-                            <input
-                                id={'endAt'}
-                                name={'endAt'}
-                                type={'datetime-local'}
-                                defaultValue={toLocalDateInputField(endAt)}
-                                onChange={() => setEndAt(new Date(document.getElementById('endAt').value))}
-                            />
-                            <br/>
-                        </>
-                    }
-                    <label htmlFor={'categorySelector'}>Category:</label>
-                    <select id="categorySelector">
+                    <select
+                        id="categorySelector"
+                        defaultValue={category || 'arrangement'}
+                        onChange={(event) => setCategory(event.target.value)}
+                    >
                         <option value="arrangement">Arrangement</option>
                         <option value="reminder">Reminder</option>
                         <option value="task">Task</option>
                     </select>
+                    {category !== 'reminder' &&
+                        <div>
+                            <input
+                                type="checkbox"
+                                id="notification"
+                                name="notification"
+                            />
+                            <label htmlFor="notification">Notification</label>
+                        </div>
+                    }
+                    {category === 'arrangement' &&
+                        <div>
+                            <input
+                                id={'place'}
+                                type={'text'}
+                                placeholder={'Place'}
+                            />
+                        </div>
+                    }
+                    {category === 'task' &&
+                        <div>
+                            <input
+                                type="checkbox"
+                                id="complete"
+                                name="complete"
+                            />
+                            <label htmlFor="notification">Complete</label>
+                        </div>
+                    }
                     <button onClick={submitFrom}>Submit</button>
                 </div>
             </div>

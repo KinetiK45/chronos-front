@@ -118,7 +118,7 @@ function DayView({ calendarData = {id: 1},
 
         const newEvent = {
             calendar_id: calendarData.id,
-            title: 'New event',
+            title: 'Нова подія',
             description: '',
             category: 'task',
             startAt: startAt,

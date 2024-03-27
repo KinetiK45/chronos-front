@@ -10,13 +10,6 @@
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.event-editor #description {
-    background: transparent;
-    color: var(--text-color);
-    transition-duration: unset;
-    resize: vertical;
-}
-
 .event-editor > * {
     width: 100%;
     margin-bottom: 5px;

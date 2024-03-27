@@ -191,5 +191,12 @@ export function getDaysInMonth(date) {
     return daysArray;
 }
 
+export function logout() {
+    localStorage.removeItem('user_id');
+    localStorage.removeItem('token');
+    localStorage.removeItem('defaultCalendar');
+    window.location.href = `${window.location.origin}/login`;
+}
+
 
 

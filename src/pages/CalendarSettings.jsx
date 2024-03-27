@@ -108,7 +108,7 @@ function CalendarSettings() {
                                                     if (resp.state === true)
                                                         window.location.href = `/users/${localStorage.getItem('user_id')}`;
                                                     else
-                                                        alert('Something went wrong');
+                                                        alert('Щось пішло не так...');
                                                 })
                                         }}
                                         xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 32 32">
@@ -119,7 +119,7 @@ function CalendarSettings() {
                             <h1>
                                 <EditableTextInput
                                     initialText={calendarData.title}
-                                    placeholder={'Title'}
+                                    placeholder={'Назва календаря'}
                                     onEdited={async (value) => {
                                         await sendEditedData({
                                             title: value,
@@ -133,7 +133,7 @@ function CalendarSettings() {
                             }}>
                                 <EditableTextInput
                                     initialText={calendarData.description}
-                                    placeholder={'Description'}
+                                    placeholder={'Опис'}
                                     onEdited={async (value) => {
                                         await sendEditedData({
                                             description: value,
@@ -195,20 +195,6 @@ function CalendarSettings() {
                                             href={`${window.location.origin}/users/${userdata.user_id}`}>
                                             {`${userdata.full_name}`}
                                         </a>
-                                        {/*<div className="color-picker">*/}
-                                        {/*    <input*/}
-                                        {/*        style={{*/}
-                                        {/*            cursor: userdata.user_id === Number.parseInt(localStorage.getItem('user_id')) ? 'pointer' : '',*/}
-                                        {/*        }}*/}
-                                        {/*        className={'color-picker-input'}*/}
-                                        {/*        type={'color'}*/}
-                                        {/*        defaultValue={userdata.color}*/}
-                                        {/*        onChange={(event) =>*/}
-                                        {/*            sendEditedData({color: event.target.value})*/}
-                                        {/*        }*/}
-                                        {/*        disabled={userdata.user_id !== Number.parseInt(localStorage.getItem('user_id'))}*/}
-                                        {/*    />*/}
-                                        {/*</div>*/}
                                         <label
                                             className="color-picker"
                                             style={{
@@ -264,8 +250,8 @@ function CalendarSettings() {
                                                 )
                                             }}
                                         >
-                                            <option value="editor">Editor</option>
-                                            <option value="inspector">Inspector</option>
+                                            <option value="editor">Редактор</option>
+                                            <option value="inspector">Спостерігач</option>
                                         </select>
                                     }
                                     {

@@ -73,12 +73,11 @@ function CalendarView({
                     id="timeInterval"
                     value={viewMode}
                     onChange={handleSelectChange}>
-                    <option value="month">Month</option>
-                    <option value="week">Week</option>
-                    <option value="day">Day</option>
+                    <option value="month">Місяць</option>
+                    <option value="week">Тиждень</option>
+                    <option value="day">День</option>
                 </select>
             </div>
-            {/*<a href={`/calendars/${calendarData.id}/createEvent?startAt=${selectedDay.toISOString()}&endAt=${selectedDay.toISOString()}`}>Create Event</a>*/}
             {viewMode === 'month' &&
                 <MonthView
                     calendarData={calendarData}
@@ -102,6 +101,20 @@ function CalendarView({
                     onDaySelect={selectViewMode}
                 />
             }
+            <div
+                style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    padding: 5
+                }}
+            ><a
+                href={`/calendars/${calendarData.id}/createEvent?startAt=${selectedDay.toISOString()}&endAt=${selectedDay.toISOString()}`}>
+                <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="100" height="100" viewBox="0 0 32 32">
+                    <path d="M16,3C8.832,3,3,8.832,3,16s5.832,13,13,13s13-5.832,13-13S23.168,3,16,3z M22.989,16.207c0,1.034-0.741,1.911-1.755,2.11	c-0.419,0.082-0.84,0.154-1.262,0.217c-0.751,0.111-1.328,0.688-1.438,1.439c-0.062,0.422-0.134,0.843-0.217,1.262	c-0.199,1.014-1.077,1.755-2.111,1.755h-0.413c-1.034,0-1.911-0.741-2.111-1.755c-0.082-0.419-0.154-0.84-0.217-1.262	c-0.111-0.751-0.688-1.328-1.438-1.439c-0.422-0.062-0.843-0.134-1.262-0.217c-1.014-0.199-1.755-1.077-1.755-2.174v-0.35	c0-1.034,0.741-1.911,1.755-2.11c0.419-0.082,0.84-0.154,1.262-0.217c0.751-0.111,1.328-0.688,1.438-1.439	c0.062-0.422,0.134-0.843,0.217-1.262c0.199-1.014,1.077-1.755,2.111-1.755h0.413c1.034,0,1.911,0.741,2.111,1.755	c0.082,0.419,0.154,0.84,0.217,1.262c0.111,0.751,0.688,1.328,1.438,1.439c0.422,0.062,0.843,0.134,1.262,0.217	c1.014,0.199,1.755,1.077,1.755,2.174V16.207z"></path>
+                </svg>
+                Створити подію
+            </a></div>
+
         </div>
     );
 }

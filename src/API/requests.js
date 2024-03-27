@@ -1,5 +1,5 @@
 import axios from "axios";
-import {toShortDateFormat} from "../utils/Utils";
+import {logout, toShortDateFormat} from "../utils/Utils";
 
 // const domain = 'http://18.119.118.118/api';
 const domain = 'http://192.168.1.4:3001/api';
@@ -10,6 +10,31 @@ const axiosInstance = axios.create({
         'Accept':'application/json'
     }
 });
+
+axiosInstance.interceptors.response.use(response => {
+    return response;
+}, error => {
+    if (error.response) {
+        // Ошибка пришла с сервера (например, ошибка статуса HTTP)
+        const statusCode = error.response.status;
+        if (statusCode === 401) {
+            logout();
+            return Promise.reject({ state: false, message: 'Authorization error: Unauthorized' });
+        } else {
+            // Общая обработка других ошибок от сервера
+            const errorMessage = error.response.data.message || 'Unknown server error';
+            return Promise.reject({ state: false, message: errorMessage });
+        }
+    } else if (error.request) {
+        // Запрос был сделан, но ответ не был получен
+        return Promise.reject({ state: false, message: 'Request error: no response received' });
+    } else {
+        // Что-то пошло не так при настройке запроса
+        return Promise.reject({ state: false, message: 'Request setup error: ' + error.message });
+    }
+});
+
+
 
 export default class Requests {
     // AUTH

@@ -81,12 +81,12 @@ function EventEditor({
         <input
             id={'title'}
             type={'text'}
-            placeholder={'Title'}
+            placeholder={'Назва події'}
             defaultValue={eventData?.title}
         />
         <textarea
             id="description"
-            placeholder="Description"
+            placeholder="Опис"
             defaultValue={eventData?.description}
             maxLength={255}
         />
@@ -95,9 +95,9 @@ function EventEditor({
             defaultValue={eventData?.category || 'arrangement'}
             onChange={(event) => setCategory(event.target.value)}
         >
-            <option value="arrangement">Arrangement</option>
-            <option value="reminder">Reminder</option>
-            <option value="task">Task</option>
+            <option value="arrangement">Захід</option>
+            <option value="reminder">Нагадування</option>
+            <option value="task">Завдання</option>
         </select>
 
         {category !== 'reminder' &&
@@ -108,7 +108,7 @@ function EventEditor({
                     name="notification"
                     defaultChecked={eventData.notification}
                 />
-                <label htmlFor="notification">Notification</label>
+                <label htmlFor="notification">Сповіщення</label>
             </div>
         }
         {category === 'arrangement' &&
@@ -116,8 +116,8 @@ function EventEditor({
                 <input
                     id={'place'}
                     type={'text'}
-                    placeholder={'Place'}
-                    defaultValue={eventData?.place.trim()}
+                    placeholder={'Місце'}
+                    defaultValue={eventData?.place?.trim()}
                 />
             </div>
         }
@@ -127,9 +127,9 @@ function EventEditor({
                     type="checkbox"
                     id="complete"
                     name="complete"
-                    defaultChecked={eventData.complete}
+                    defaultChecked={eventData?.complete}
                 />
-                <label htmlFor="notification">Complete</label>
+                <label htmlFor="complete">Статус виконання</label>
             </div>
         }
         <div

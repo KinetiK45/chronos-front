@@ -1,17 +1,12 @@
 import './Navigation.css';
 import Requests from "../API/requests";
 import {useEffect, useState} from "react";
-
-function logout() {
-    localStorage.removeItem('user_id');
-    localStorage.removeItem('token');
-    window.location.href = `${window.location.origin}/login`;
-}
+import {logout} from "../utils/Utils";
 
 function Navigation() {
 
     const [userdata, setUserdata] = useState({
-        username: 'Loading...',
+        username: 'Завантаження...',
     });
 
     useEffect(() => {
@@ -31,12 +26,12 @@ function Navigation() {
                 className={'main-links'}
             >
                 {localStorage.getItem('defaultCalendar') &&
-                    <a href={`${window.location.origin}/calendars/${localStorage.getItem('defaultCalendar')}`}>Home</a>
+                    <a href={`${window.location.origin}/calendars/${localStorage.getItem('defaultCalendar')}`}>Головна</a>
                 }
                 {!localStorage.getItem('defaultCalendar') &&
-                    <a href={`${window.location.origin}/users/${localStorage.getItem('user_id')}`}>Home</a>
+                    <a href={`${window.location.origin}/users/${localStorage.getItem('user_id')}`}>Головна</a>
                 }
-                <a href={'/holidays'}>Holidays</a>
+                <a href={'/holidays'}>Свята</a>
             </div>
             {localStorage.getItem('user_id') &&
                 <div className={'userdata-min'}>
