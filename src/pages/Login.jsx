@@ -40,13 +40,16 @@ function Login() {
         <div className="main">
             <Navigation/>
             <div className={'main-content'}>
-                <div className={'center-block'}>
+                <div
+                    className={'center-block'}
+                    style={{
+                        minWidth: 0
+                    }}
+                >
                     <h1>Вхід</h1>
                     <div className={'errors'}></div>
                     <div className={'inputs'}>
-                        <label htmlFor={'username'}>Логін:</label>
                         <input id={'username'} name={'username'} type={'text'} placeholder={'username'}/>
-                        <label htmlFor={'password'}>Пароль:</label>
                         <input id={'password'} name={'password'} type={'password'} placeholder={'password'}/>
                     </div>
                     <div className={'text-line'}>

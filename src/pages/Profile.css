@@ -1,9 +1,5 @@
-.user-info {
-    padding: 10px;
-    display: flex;
-}
-
 .avatar-container{
+    margin: auto;
     height: 100px;
     width: 100px;
     overflow: hidden;
@@ -19,11 +15,6 @@
 .profileAvatar:hover {
     cursor: copy;
     border: 1px solid var(--border-color);
-}
-
-.right-size-block {
-    /*border: 1px solid white;*/
-    width: 700px;
 }
 
 .calendars {
@@ -43,6 +34,7 @@
 
 .main-calendar-info {
     border-radius: 10px 0 0 10px;
+    padding: 5px;
 }
 
 .calendar-info-optional {

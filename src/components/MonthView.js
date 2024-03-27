@@ -1,72 +1,67 @@
 import './MonthView.css';
 import CalendarCell from "./CalendarCell";
-import {useState} from "react";
-
-function getDaysInMonth(date) {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const daysArray = [];
-
-    for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month, day);
-        daysArray.push(date);
-    }
-
-    return daysArray;
-}
-
-function getMonthTitle(day){
-    let month = day.toLocaleDateString(undefined, { month: 'long' });
-    month = month.charAt(0).toUpperCase() + month.slice(1);
-    return `${month} ${day.getFullYear()}`;
-}
-
+import {useEffect, useState} from "react";
+import ViewTitle from "./ViewTitle";
+import {
+    toMonthTitleFormat,
+    getWeekDates,
+    getStartEndWeekByDate,
+    fillEventsFullData,
+    getStartEndMonthByDate, filterEventsToTargetDate, getDaysInMonth
+} from "../utils/Utils";
+import Requests from "../API/requests";
 function MonthView({
-                       calendarId,
-                       getInfoByDay,
+                       calendarData,
                        selectedDate = new Date(),
                        onDaySelect = function (day, viewMode){}
 }) {
-    const weekdays = Array.from({ length: 7 }, (_, index) => {
-        const currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() - currentDate.getDay() + 1 + index);
-        return currentDate.toLocaleDateString(undefined, { weekday: 'short' });
-    });
+    const [monthDayViewAnchor, setMonthDayViewAnchor] = useState(selectedDate);
 
-    const [monthDayView, setMonthDayView] = useState(selectedDate);
+    const [monthEvents, setMonthEvents] = useState([]);
+    //заполнение events
+    useEffect(() => {
+        const fetchData = async () => {
+            const startEndCurrentMonth = getStartEndMonthByDate(monthDayViewAnchor);
+            const events_resp = await Requests.allEvents(
+                localStorage.getItem('token'),
+                calendarData.id,
+                startEndCurrentMonth[0],
+                startEndCurrentMonth[1]
+            );
+            if (events_resp?.data?.events) {
+                setMonthEvents(fillEventsFullData(events_resp.data.events, calendarData));
+            }
+        };
+        if (calendarData !== null)
+            fetchData();
+    }, [calendarData, monthDayViewAnchor]);
 
     return (
         <div
             className={'month-calendar'}
         >
-            <div className={'month-header'}>
-                <button
-                    onClick={() => {
-                        let newDate = new Date(monthDayView);
-                        newDate.setMonth(monthDayView.getMonth() - 1);
-                        setMonthDayView(newDate);
-                    }
-                }
-                >prev</button>
-                <h3>{getMonthTitle(monthDayView)}</h3>
-                <button onClick={() => {
-                    let newDate = new Date(monthDayView);
-                    newDate.setMonth(monthDayView.getMonth() + 1);
-                    setMonthDayView(newDate);
-                    }
-                }>next</button>
-            </div>
-
-            <div className={'days-names'}>
-                {weekdays.map((day, index) => (
-                    <div key={index} className={'day-name'}>
-                        {day}
+            <ViewTitle
+                titleStr={toMonthTitleFormat(monthDayViewAnchor)}
+                onPrev={() => {
+                    let newDate = new Date(monthDayViewAnchor);
+                    newDate.setMonth(monthDayViewAnchor.getMonth() - 1);
+                    setMonthDayViewAnchor(newDate);
+                }}
+                onNext={() => {
+                    let newDate = new Date(monthDayViewAnchor);
+                    newDate.setMonth(monthDayViewAnchor.getMonth() + 1);
+                    setMonthDayViewAnchor(newDate);
+                }}
+            />
+            <div className={'day-names'}>
+                {getWeekDates(monthDayViewAnchor).map((date, index) => (
+                    <div key={`day-name-${index}`} className={'day-name'}>
+                        {`${date.toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase()}`}
                     </div>
                 ))}
             </div>
             <div className={'days'}>
-                {monthDayView && getDaysInMonth(monthDayView)
+                {monthDayViewAnchor && getDaysInMonth(monthDayViewAnchor)
                     .map((date) => (
                             <div
                                 onClick={() => onDaySelect(date, 'day')}
@@ -81,9 +76,8 @@ function MonthView({
                                 {
                                     <CalendarCell
                                         date={date}
-                                        calendarId={calendarId}
-                                        events={getInfoByDay(date)[0]}
-                                        holidays={getInfoByDay(date)[1]}
+                                        calendarId={calendarData.id}
+                                        events={filterEventsToTargetDate(date, monthEvents)}
                                     />
                                 }
                             </div>

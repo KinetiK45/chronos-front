@@ -20,22 +20,9 @@
     margin: 10px;
 }
 
-.inputs {
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    gap: 10px;
-    margin-left: auto;
-}
-
 label {
     align-self: center;
     text-align: start;
-}
-
-.inputs > input {
-    width: 100%;
-    padding: 8px;
-    box-sizing: border-box;
 }
 
 .form-submit {

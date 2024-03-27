@@ -1,6 +1,6 @@
 import './EditableTextInput.css'
 import {useRef, useState} from "react";
-function EditableTextInput({initialText, placeholder, onEdited}) {
+function EditableTextInput({initialText, placeholder, onEdited, canEmpty = true}) {
     const elementRef = useRef(null);
     const inputRef = useRef(null);
     const [editing, setEditing] = useState(false);
@@ -28,6 +28,15 @@ function EditableTextInput({initialText, placeholder, onEdited}) {
                 <div className={'editable-input-buttons'}>
                     <svg
                         onClick={(event) => {
+                            if (!canEmpty && !inputRef.current.value) {
+                                inputRef.current.style.borderBottom = '1px solid red';
+                                inputRef.current.style.color = 'red';
+                                setTimeout(() => {
+                                    inputRef.current.style.color = 'var(--text-color)';
+                                    inputRef.current.style.borderBottom = '1px solid var(--text-color)'
+                                }, 1000);
+                                return;
+                            }
                             setCurrentText(inputRef.current.value);
                             onEdited(inputRef.current.value || '');
                             setEditing(false);

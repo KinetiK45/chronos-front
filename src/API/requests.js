@@ -1,9 +1,8 @@
 import axios from "axios";
 import {toShortDateFormat} from "../utils/Utils";
 
-// const domain = 'http://localhost:3001/api';
-const domain = 'http://192.168.1.5:3001/api';
-
+// const domain = 'http://18.119.118.118/api';
+const domain = 'http://192.168.1.4:3001/api';
 const axiosInstance = axios.create({
     baseURL: domain,
     headers: {
@@ -29,12 +28,6 @@ export default class Requests {
         let obj = {username:username, password:password};
         const resp = await
             axiosInstance.post('/auth/login', obj);
-        return resp.data;
-    }
-    //TODO: импорт в навигацию
-    static async logout(){
-        const resp = await
-            axiosInstance.post('/auth/logout');
         return resp.data;
     }
     static async passwordResetCreate(email){
@@ -167,6 +160,15 @@ export default class Requests {
         const resp = await axiosInstance.get(`/calendar/users/${calendarId}`, config);
         return resp.data;
     }
+    static async deleteCalendar(token, calendarId){
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        };
+        const resp = await axiosInstance.delete(`/calendar/${calendarId}/delete`, config);
+        return resp.data;
+    }
 
     static async shareCalendar(token, data) {
         const config = {
@@ -203,6 +205,20 @@ export default class Requests {
 
         const resp = await
             axiosInstance.get(`/events/byCalendarPeriod/${calendar_id
+            }?startAt=${toShortDateFormat(startDate)
+            }&endAt=${toShortDateFormat(endDate)}`, config);
+        return resp.data;
+    }
+
+    static async countEvents(token, calendar_id, startDate, endDate){
+        const config = {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        };
+
+        const resp = await
+            axiosInstance.get(`/events/countEvents/${calendar_id
             }?startAt=${toShortDateFormat(startDate)
             }&endAt=${toShortDateFormat(endDate)}`, config);
         return resp.data;

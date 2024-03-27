@@ -1,7 +1,7 @@
 body {
   background-color: var(--background-color-main);
   overflow-x: hidden;
-  font-size: calc(10px + 2vmin);
+  font-size: 24px;
   display: flex;
   justify-content: center;
   font-family: Arial, Helvetica, sans-serif;
@@ -20,9 +20,9 @@ hr {
   margin: 8px 0 0 0;
 }
 
-svg {
-  width: 20px;
-  height: 20px;
+svg, .svg-image {
+  max-width: 20px;
+  max-height: 20px;
   fill: var(--text-color);
 }
 
@@ -38,10 +38,31 @@ input[type='text'], input[type='password'], input[type='email'] {
   color: var(--text-color);
 }
 
+textarea {
+  border: none;
+}
+
+textarea::placeholder, input[type='text']::placeholder, input[type='password']::placeholder, input[type='email']::placeholder {
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+input[type='text']:focus, input[type='password']:focus, input[type='email']:focus {
+  border: none;
+  outline: none;
+  border-bottom: 2px solid var(--text-color);
+}
+
 select {
+  font-weight: bold;
   background: none;
   border: none;
   color: var(--text-color);
+  outline: none;
+}
+
+select > option {
+  background-color: var(--background-color-objects);
 }
 
 .main {

@@ -3,24 +3,39 @@ import {useEffect, useState} from "react";
 import EventEditor from "./EventEditor";
 import DayViewEvent from "./DayViewEvent";
 import Requests from "../API/requests";
-import {toLocalDateInputField} from "../utils/Utils";
+import {fillEventsFullData, toLocalDateInputField} from "../utils/Utils";
+import ViewTitle from "./ViewTitle";
 
 function DayView({ calendarData = {id: 1},
                      initialDate = new Date(),
-                     getInfoByDay
+                     onDaySelect
                  }) {
 
-    const [currentViewDate, setCurrentViewDate] = useState(initialDate);
+    const [currentViewDateAnchor, setCurrentViewDateAnchor] = useState(initialDate);
     const [events, setEvents] = useState([]);
-    const [holidays, setHolidays] = useState([]);
-    const [eventEditor, setEventEditor] = useState(undefined);
     const isViewer = 'calendar_user' in calendarData && calendarData.calendar_user.role === 'inspector';
-    useEffect(() => {
-        const data = getInfoByDay(currentViewDate);
-        setEvents(fillViewColumns(data[0]));
-        setHolidays(data[1]);
 
-    }, [currentViewDate, getInfoByDay]);
+    //получение ивентов
+    useEffect(() => {
+        const fetchData = async () => {
+            const startDay = new Date(currentViewDateAnchor.setHours(0,0,0,0));
+            const events_resp = await Requests.allEvents(
+                localStorage.getItem('token'),
+                calendarData.id,
+                startDay,
+                new Date(startDay.getTime() + 24 * 60 * 60 * 1000)
+            );
+
+            if (events_resp?.data?.events) {
+                refreshEvents(
+                    fillEventsFullData(events_resp.data.events, calendarData)
+                );
+            }
+        };
+        if (calendarData !== null)
+            fetchData();
+        onDaySelect(currentViewDateAnchor);
+    }, [calendarData, currentViewDateAnchor]);
 
     const [eventColumnsSize, setEventColumnsSize] = useState(2);
 
@@ -56,7 +71,6 @@ function DayView({ calendarData = {id: 1},
             }
             event.columnIndex = index;
         }
-        // setEventColumnsSize(3);
         return events;
     }
 
@@ -98,13 +112,13 @@ function DayView({ calendarData = {id: 1},
 
         // Рассчитываем процентное расстояние
         const hours = (offsetY / event.currentTarget.clientHeight) * 24;
-        let startAt = new Date(currentViewDate);
+        let startAt = new Date(currentViewDateAnchor);
         startAt.setHours(Math.floor(hours), Math.round(hours % 1 * 6) * 10, 0, 0);
         const endAt = new Date(startAt.getTime() + 1000 * 60 * 30);
 
         const newEvent = {
             calendar_id: calendarData.id,
-            title: 'New Event',
+            title: 'New event',
             description: '',
             category: 'task',
             startAt: startAt,
@@ -132,52 +146,69 @@ function DayView({ calendarData = {id: 1},
 
         newEvent.columnIndex = column;
         refreshEvents([...events, newEvent]);
-
-        setEventEditor({
-            eventData: newEvent,
-            startAt: startAt,
-            endAt: endAt,
-            columnIndex: column === eventColumnsSize - 1 ? column - 1 : column + 1,
-        });
     }
 
 
-    const [editorEnabled, setEditorEnabled] = useState(false);
+    const [currentEditingData, setCurrentEditingData] = useState(null);
 
-    function onEditorCalled(editorData) {
-        setEditorEnabled(!editorEnabled);
-        setEventEditor(editorData);
+    const [editor_coords, setEditor_coords] = useState({
+        top: 0,
+        left: 0
+    });
+
+    function formatTitle(date) {
+        const options = { weekday: 'short', day: 'numeric', month: 'long' };
+        const dateString = date.toLocaleDateString(undefined, options);
+        const firstTwoLetters = dateString.slice(0, 2).toUpperCase();
+        const dayAndMonth = dateString.slice(2);
+        return `${firstTwoLetters}${dayAndMonth}`;
     }
 
     return (
         <div
             className={'selected-calendar-day'}
         >
-            <div className={'month-header'}>
-                <button
-                    onClick={() => {
-                        setCurrentViewDate(new Date(currentViewDate.getTime() - 24 * 60 * 60 * 1000));
-                    }
-                    }
-                >prev</button>
-                <h1>{`${currentViewDate.toLocaleDateString(undefined,
-                    { weekday: 'short', day: 'numeric', month: 'long' })}`}</h1>
-                <button onClick={() => {
-                    setCurrentViewDate(new Date(currentViewDate.getTime() + 24 * 60 * 60 * 1000));
-                }
-                }>next</button>
-            </div>
-            {holidays.length > 0 &&
-                <div className={'holidays'}>
-                    <h3>Holidays:</h3>
-                    {holidays.map((el) =>(
-                        <div key={el.localName}>
-                            {el.localName}
-                        </div>
-                    ))}
-                </div>
+            <ViewTitle
+                titleStr={`${formatTitle(currentViewDateAnchor)}`}
+                onPrev={() => {
+                    setEvents([]);
+                    setCurrentViewDateAnchor(new Date(currentViewDateAnchor.getTime() - 24 * 60 * 60 * 1000));
+                }}
+                onNext={() => {
+                    setEvents([]);
+                    setCurrentViewDateAnchor(new Date(currentViewDateAnchor.getTime() + 24 * 60 * 60 * 1000));
+                }}
+            />
+            {currentEditingData !== null &&
+                <EventEditor
+                    eventData={currentEditingData}
+                    coords={editor_coords}
+                    onEdited={(dataUpdated) => {
+                        setEvents(prevEvents => {
+                            return prevEvents.map(event => {
+                                if (event.id === dataUpdated.id) {
+                                    return dataUpdated;
+                                }
+                                return event;
+                            });
+                        });
+                    }}
+                    onDelete={(event_id) => {
+                        Requests.deleteEvent(localStorage.getItem('token'), event_id).then((resp) => {
+                            if (resp.state === true){
+                                setCurrentEditingData(null);
+                                refreshEvents(events.filter((ev) => ev.id !== event_id));
+                            }
+                            else {
+                                alert(`Error deleting event: ${resp.message}`);
+                            }
+                        })
+                    }}
+                    onHide={() => {
+                        setCurrentEditingData(null);
+                    }}
+                />
             }
-
             <div
                 className="hours-container"
             >
@@ -195,7 +226,7 @@ function DayView({ calendarData = {id: 1},
                              userSelect: 'none',
                          }}
                     >
-                        {`${new Date(currentViewDate.getFullYear(), currentViewDate.getMonth(), currentViewDate.getDate(), hour / 2, hour % 2 ? 30 : 0)
+                        {`${new Date(currentViewDateAnchor.getFullYear(), currentViewDateAnchor.getMonth(), currentViewDateAnchor.getDate(), hour / 2, hour % 2 ? 30 : 0)
                             .toLocaleTimeString(undefined, {hour: "numeric", minute: "numeric"})}`}
                     </div>
                 ))}
@@ -211,48 +242,25 @@ function DayView({ calendarData = {id: 1},
                             <DayViewEvent
                                 key={`event-${day_event.id}-full`}
                                 eventData={day_event}
-                                currentViewDate={currentViewDate}
+                                currentViewDate={currentViewDateAnchor}
                                 countColumns={eventColumnsSize}
-                                onEditorCalled={onEditorCalled}
                                 onTimeChange={refreshEvents}
-                                isResizable={!isViewer}
+                                canChange={!isViewer}
+                                onEditorCalled={(event) => {
+                                    setCurrentEditingData(day_event);
+                                    setEditor_coords({
+                                        'top': window.scrollY + event.clientY,
+                                        'left': window.scrollX + event.clientX
+                                    });
+                                }}
                             />
                         ))
-                    }
-
-                    {
-                        !isViewer && editorEnabled && eventEditor &&
-                        <EventEditor
-                            eventEditor={eventEditor}
-                            countColumns={eventColumnsSize}
-                            onEdited={(dataUpdated) => {
-                                setEvents(prevEvents => {
-                                    return prevEvents.map(event => {
-                                        if (event.id === dataUpdated.id) {
-                                            return dataUpdated;
-                                        }
-                                        return event;
-                                    });
-                                });
-                            }}
-                            onDelete={(event_id) => {
-                                Requests.deleteEvent(localStorage.getItem('token'), event_id).then((resp) => {
-                                    if (resp.state === true){
-                                        refreshEvents(events.filter((ev) => ev.id !== event_id));
-                                        setEditorEnabled(false);
-                                    }
-                                    else {
-                                        alert(`Error deleting event: ${resp.message}`);
-                                    }
-                                })
-                            }}
-                        />
                     }
                 </div>
                 <div
                     className={'current-time-line'}
                     style={{
-                        display: currentViewDate.getDate() === new Date().getDate() ? '' : 'none',
+                        display: currentViewDateAnchor.getDate() === new Date().getDate() ? '' : 'none',
                         pointerEvents: 'none',
                     }}
                 ></div>

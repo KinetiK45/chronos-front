@@ -1,6 +1,6 @@
 .week-event {
     position: absolute;
-    padding-left: 5px;
+    padding: 2px;
     border-radius: 0 5px 5px 0;
     /*text-overflow: ellipsis;*/
     overflow: hidden;
@@ -8,13 +8,14 @@
     cursor: default;
     /*transition-duration: 1s;*/
     user-select: none;
+    backdrop-filter: blur(3px);
 }
 
 .week-event:hover {
     /*min-height: max-content;*/
     /*height: max-content;*/
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(2em);
+    backdrop-filter: blur(9px);
 }
 
 

@@ -1,20 +1,27 @@
 .calendar-cell {
     height: 50px;
+    display: flex;
     width: auto;
     color: var(--text-color);
-    background-color: var(--calendar-cells-background);
+    background: linear-gradient(to right, var(--calendar-cells-background) -90%, transparent);
+    border-left: 2px solid var(--calendar-cells-background);
+    border-radius: 5px;
+    /*background-color: var(--calendar-cells-background);*/
     padding: 5px;
     font-weight: bold;
     position: relative;
+    transition-duration: 1s;
 }
 
-/*.current-day{*/
-/*    border: 2px solid black;*/
-/*}*/
+.calendar-cell:hover {
+    background: linear-gradient(to right, var(--calendar-cells-background), transparent);
+}
+
+.current-day{
+    background: linear-gradient(to right, var(--calendar-cells-background), transparent);
+}
 
 .date-of-month {
-    position: absolute;
-    width: fit-content;
 }
 
 .events-size, .holidays-size {

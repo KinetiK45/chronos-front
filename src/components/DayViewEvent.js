@@ -17,9 +17,10 @@ function DayViewEvent({
                           eventData,
                           currentViewDate,
                           countColumns,
-                          onEditorCalled,
                           onTimeChange,
-                          isResizable = true}) {
+                          canChange = true,
+                          onEditorCalled,
+}) {
     const eventDataRef = useRef(null);
     const eventLineRef = useRef(null);
     const [timeUpdate, setTimeUpdate] = useState(false);
@@ -61,7 +62,7 @@ function DayViewEvent({
     let initialEndTime = eventData.endAt;
 
     function handleResizeStart(event) {
-        if (!isResizable)
+        if (!canChange)
             return;
         const mouseY = event.clientY;
         const rect = event.target.getBoundingClientRect();
@@ -142,7 +143,6 @@ function DayViewEvent({
         onTimeChange();
         // console.log(`resize end`);
     }
-
     return <div
         onDoubleClick={(event) => {event.stopPropagation();}}
     >
@@ -159,7 +159,7 @@ function DayViewEvent({
                     height: `${calculateEventH(eventData, currentViewDate)}%`,
                     top: `${getEventHeightPercent(0, getDateMinutes(eventData.startAt, currentViewDate))}%`,
                     left: `${calculateEventLeft(eventData.columnIndex, countColumns)}%`,
-                    cursor: isResizable ? 'ns-resize' : 'default',
+                    cursor: canChange ? 'ns-resize' : 'default',
                 }
             }/>
 
@@ -194,14 +194,8 @@ function DayViewEvent({
             <DayViewEventDataDisplay
                 currentViewDate={currentViewDate}
                 eventData={eventData}
-                onEditButtonPressed={() => {
-                    onEditorCalled({
-                        eventData: eventData,
-                        startAt: eventData.startAt,
-                        endAt: eventData.endAt,
-                        columnIndex: eventData.columnIndex === countColumns - 1 ? eventData.columnIndex - 1 : eventData.columnIndex + 1,
-                    });
-                }}
+                onEditButtonClicked={onEditorCalled}
+                canChange={canChange}
             />
         </div>
     </div>

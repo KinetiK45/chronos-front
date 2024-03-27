@@ -14,20 +14,18 @@ const TRANSITION_DURATION = '0.5s';
 function WeekViewEvent({
                           eventData,
                           currentViewDate,
-                          countColumns,
                           isResizable = true}) {
     const eventDataRef = useRef(null);
-    const eventLineRef = useRef(null);
 
     useEffect(() => {
         const height = eventDataRef.current.scrollHeight; //текущая высота элемента
-        eventDataRef.current.style.width = `${100 / countColumns}%`;
+        eventDataRef.current.style.width = `${eventData.widthPercentage}%`;
         const parentHeight = document.querySelector('.hours-container').offsetHeight; //высота родителя
 
         const topPercent = getEventHeightPercent(0, getDateMinutes(eventData.startAt, currentViewDate)); //отступ сверху
 
         const heightCalculated = calculateEventH(eventData, currentViewDate);
-        const minHeightPercent = Math.max(heightCalculated, 14 / parentHeight * 100);
+        const minHeightPercent = Math.max(heightCalculated, 5 / parentHeight * 100);
         eventDataRef.current.style.minHeight = `${minHeightPercent}%`;
 
         const maxHeightPercent = Math.max(heightCalculated, height / parentHeight * 100);
@@ -43,35 +41,22 @@ function WeekViewEvent({
             eventDataRef.current.style.bottom = '';
             eventDataRef.current.style.height = `${calculateEventH(eventData, currentViewDate)}%`;
         }
+        eventDataRef.current.style.visibility = '';
     }, [currentViewDate, eventData]);
 
     let timeoutId = null;
     const handleMouseEnter = () => {
         console.log('onmouse enter');
-        eventDataRef.current.style.zIndex = 2;
-        eventLineRef.current.style.zIndex = 3;
+        eventDataRef.current.style.borderLeft = `2px solid ${eventData.color}`;
         timeoutId = setTimeout(() => {
+            eventDataRef.current.style.zIndex = 999;
             eventDataRef.current.style.height = eventDataRef.current.style.maxHeight;
-            eventDataRef.current.style.width = '100%';
+            eventDataRef.current.style.width = '98%';
             eventDataRef.current.style.left = '0%';
-            eventLineRef.current.style.left = '0%';
-        }, 1000); // Время задержки в миллисекундах (здесь 1000 миллисекунд = 1 секунда)
+        }, 500); // Время задержки в миллисекундах (здесь 1000 миллисекунд = 1 секунда)
     }
 
     return <div>
-        <div
-            key={`event-${eventData.id}-time-line`}
-            ref={eventLineRef}
-            className={'week-event-timeline'}
-            style={
-                {
-                    backgroundColor: `${hexToRgba(eventData.color || '#FFFFFF')}`,
-                    height: `${calculateEventH(eventData, currentViewDate)}%`,
-                    top: `${getEventHeightPercent(0, getDateMinutes(eventData.startAt, currentViewDate))}%`,
-                    left: `${calculateEventLeft(eventData.columnIndex, countColumns)}%`,
-                    cursor: isResizable ? 'ns-resize' : 'default',
-                }
-            }/>
         <div
             ref={eventDataRef}
             className={`week-event event-${eventData.id}`}
@@ -82,11 +67,10 @@ function WeekViewEvent({
             onMouseEnter={handleMouseEnter}
             onMouseLeave={() => {
                 clearTimeout(timeoutId);
-                eventDataRef.current.style.width = `${100 / countColumns}%`;
-                eventDataRef.current.style.left = `${calculateEventLeft(eventData.columnIndex, countColumns)}%`;
-                eventLineRef.current.style.left = `${calculateEventLeft(eventData.columnIndex, countColumns)}%`;
-                eventDataRef.current.style.zIndex = '';
-                eventLineRef.current.style.zIndex = '';
+                eventDataRef.current.style.borderLeft = `1px solid ${eventData.color}`;
+                eventDataRef.current.style.width = `${eventData.widthPercentage}%`;
+                eventDataRef.current.style.left = `${eventData.leftOffsetPercentage}%`;
+                eventDataRef.current.style.zIndex = eventData.columnIndex + 1;
                 eventDataRef.current.style.height = eventDataRef.current.style.minHeight;
             }}
             style={
@@ -94,9 +78,11 @@ function WeekViewEvent({
                     background: `linear-gradient(135deg, ${
                         hexToRgba(eventData.color || '#a2a2a2', 0.3
                         )}, transparent)`,
-                    // width: `${100 / countColumns}%`,
-                    left: `${calculateEventLeft(eventData.columnIndex, countColumns)}%`,
+                    borderLeft: `1px solid ${eventData.color}`,
+                    left: `${eventData.leftOffsetPercentage}%`,
                     transitionDuration: TRANSITION_DURATION,
+                    zIndex: eventData.columnIndex + 1,
+                    visibility: 'hidden',
                 }
             }
         >
