@@ -1,8 +1,10 @@
 import axios from "axios";
 import {logout, toShortDateFormat} from "../utils/Utils";
 
-// const domain = 'http://18.119.118.118/api';
-const domain = 'http://192.168.1.4:3001/api';
+const url = new URL(window.location.origin);
+const ip = url.hostname;
+const domain = `http://${ip}:3001/api`;
+
 const axiosInstance = axios.create({
     baseURL: domain,
     headers: {
@@ -163,7 +165,7 @@ export default class Requests {
             },
         };
         const resp = await axiosInstance.post('/calendar/create', {
-            title: 'New calendar'
+            title: 'Новий календар'
         }, config);
         return resp.data;
     }
